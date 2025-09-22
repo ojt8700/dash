@@ -110,21 +110,17 @@ fig.update_layout(
     font=dict(size=12),
 )
 
-# ✅ ズーム機能ON
+# ✅ ズーム機能ON（ズーム、ズームアウト、リセット）
 config = {
     "displayModeBar": True,
     "modeBarButtonsToRemove": [
-        "select2d", "lasso2d"  # ← ズーム関連は残す
+        "select2d", "lasso2d"  # ズーム系は残す
     ],
     "displaylogo": False
 }
 
 # グラフ描画
 st.plotly_chart(fig, use_container_width=True, config=config)
-
-# ✅ 任意のリセットボタン
-if st.button("🔄 グラフ表示をリセット"):
-    st.experimental_rerun()
 
 # データ一覧表示
 with st.expander("📅 月次データを表示"):
