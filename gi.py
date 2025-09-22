@@ -23,7 +23,7 @@ df["market"] = df["market"].astype(str).str.strip()
 st.subheader("🔍 データ preview")
 st.dataframe(df.head(), use_container_width=True)
 
-# UI
+# UI設定
 with st.expander("📊 表示設定（クリックで開く）", expanded=True):
     markets = sorted(df["market"].dropna().unique())
     default_index = 1 if len(markets) >= 1 else 0
@@ -56,14 +56,15 @@ df_l2 = get_df(left2)
 df_r1 = get_df(right1)
 df_r2 = get_df(right2)
 
-# ❗データなし警告
+# ✅ すべて「なし」なら自動リセット
 if df_l1.empty and df_l2.empty and df_r1.empty and df_r2.empty:
-    st.warning("📌 表示対象の指標が選ばれていません。左軸または右軸にデータを選択してください。")
+    st.warning("📌 表示対象がすべて未選択です。初期状態に戻します...")
+    st.experimental_rerun()
 
 # グラフ生成
 fig = make_subplots(specs=[[{"secondary_y": True}]])
 
-# データが1つでもある場合はプロット
+# 軸ごとにプロット追加
 if not df_l1.empty:
     fig.add_trace(go.Scatter(x=df_l1["date"], y=df_l1["price"], name=f"{left1} (左主)", mode="lines+markers", line=dict(color="blue")), secondary_y=False)
 if not df_l2.empty:
@@ -73,17 +74,7 @@ if not df_r1.empty:
 if not df_r2.empty:
     fig.add_trace(go.Scatter(x=df_r2["date"], y=df_r2["price"], name=f"{right2} (右副)", mode="lines+markers", line=dict(color="orange", dash="dot")), secondary_y=True)
 
-# ❗何もプロットされていない場合は注釈を表示
-if df_l1.empty and df_l2.empty and df_r1.empty and df_r2.empty:
-    fig.add_annotation(
-        text="📉 データが選択されていません",
-        xref="paper", yref="paper",
-        x=0.5, y=0.5,
-        showarrow=False,
-        font=dict(size=16, color="gray")
-    )
-
-# 軸レンジパース
+# 軸レンジパース関数
 def parse_range(inp):
     try:
         parts = inp.split('-')
@@ -103,7 +94,7 @@ fig.update_yaxes(title_text="左軸価格", secondary_y=False, range=left_range)
 fig.update_yaxes(title_text="右軸価格", secondary_y=True, range=right_range)
 fig.update_xaxes(title_text="年月")
 
-# グラフ外観設定
+# グラフ見た目調整
 fig.update_layout(
     title_text="📊 月次指標推移",
     height=400,
@@ -119,7 +110,7 @@ fig.update_layout(
     font=dict(size=12),
 )
 
-# 不要なモードバー削除
+# モードバー構成
 config = {
     "displayModeBar": True,
     "modeBarButtonsToRemove": [
@@ -128,13 +119,13 @@ config = {
     "displaylogo": False
 }
 
-# グラフ表示
+# グラフ描画
 st.plotly_chart(fig, use_container_width=True, config=config)
 
-# ✅ リセットボタン
+# ✅ 任意のリセットボタン
 if st.button("🔄 グラフ表示をリセット"):
     st.experimental_rerun()
 
-# 元データ表示
+# データ一覧表示
 with st.expander("📅 月次データを表示"):
     st.dataframe(df, use_container_width=True)
