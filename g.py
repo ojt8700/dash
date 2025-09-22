@@ -8,7 +8,7 @@ st.set_page_config(layout="centered")
 st.title("📈 月次指標推移")
 
 # GitHub CSV 読み込み
-github_csv_url = "https://raw.githubusercontent.com/your-username/your-repo/main/getuji.csv"
+github_csv_url = "https://raw.githubusercontent.com/ojt8700/dash/main/getuji.csv"
 try:
     df = pd.read_csv(github_csv_url)
 except Exception as e:
