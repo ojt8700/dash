@@ -1,1 +1,3 @@
-pip install plotly 
+plotly
+streamlit
+pandas
