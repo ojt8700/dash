@@ -3,26 +3,26 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-# ✅ モバイル向けにレイアウトは "centered" に
+# モバイルに最適化（centered にしておく）
 st.set_page_config(layout="centered")
 st.title("📈 月次指標推移")
 
-# ✅ GitHub 上の CSV を読み込む
-github_csv_url = "https://raw.githubusercontent.com/ojt8700/dash/main/getuji.csv"
+# GitHub CSV 読み込み
+github_csv_url = "https://raw.githubusercontent.com/your-username/your-repo/main/getuji.csv"
 try:
     df = pd.read_csv(github_csv_url)
 except Exception as e:
     st.error(f"CSVの読み込みに失敗しました: {e}")
     st.stop()
 
-# ✅ データ整形
+# データ整形
 df["date"] = pd.to_datetime(df["date"], format="%Y/%m/%d", errors="coerce")
 df["market"] = df["market"].astype(str).str.strip()
 
 st.subheader("🔍 データ preview")
 st.dataframe(df.head(), use_container_width=True)
 
-# ✅ UI をサイドバーではなく本体に表示
+# UI 設定
 with st.expander("📊 表示設定（クリックで開く）", expanded=True):
     markets = sorted(df["market"].dropna().unique())
     col1, col2 = st.columns(2)
@@ -40,7 +40,6 @@ with st.expander("📊 表示設定（クリックで開く）", expanded=True):
     with col4:
         right_range_input = st.text_input("右軸レンジ (例：50-150)", value="")
 
-# ✅ 指標ごとにデータ抽出
 def get_df(market_name):
     if market_name != "なし":
         return df[df["market"] == market_name]
@@ -52,7 +51,7 @@ df_l2 = get_df(left2)
 df_r1 = get_df(right1)
 df_r2 = get_df(right2)
 
-# ✅ グラフ作成
+# グラフ生成
 fig = make_subplots(specs=[[{"secondary_y": True}]])
 
 if not df_l1.empty:
@@ -64,10 +63,7 @@ if not df_r1.empty:
 if not df_r2.empty:
     fig.add_trace(go.Scatter(x=df_r2["date"], y=df_r2["price"], name=f"{right2} (右副)", mode="lines+markers", line=dict(color="orange", dash="dot")), secondary_y=True)
 
-fig.update_layout(title_text="📊 月次指標推移", margin=dict(t=40, b=20), height=500)
-fig.update_xaxes(title_text="年月")
-
-# ✅ Y軸レンジ入力を適用
+# レンジ処理
 def parse_range(inp):
     try:
         parts = inp.split('-')
@@ -84,13 +80,35 @@ right_range = parse_range(right_range_input)
 
 fig.update_yaxes(title_text="左軸価格", secondary_y=False, range=left_range)
 fig.update_yaxes(title_text="右軸価格", secondary_y=True, range=right_range)
+fig.update_xaxes(title_text="年月")
 
+# ✅ 凡例をグラフの下に移動し、ズームボタンの重なりを回避
 fig.update_layout(
-    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-    font=dict(size=12)
+    title_text="📊 月次指標推移",
+    height=400,  # モバイルでも見切れない高さ
+    margin=dict(l=10, r=10, t=40, b=80),  # 底に余白を確保
+    legend=dict(
+        orientation="h",
+        yanchor="top",
+        y=-0.3,  # グラフの下に表示
+        xanchor="center",
+        x=0.5,
+        font=dict(size=10)
+    ),
+    font=dict(size=12),
 )
 
-st.plotly_chart(fig, use_container_width=True)
+# ✅ 不要な mode bar をオフ（ズームボタンなどを減らす）
+config = {
+    "displayModeBar": True,
+    "modeBarButtonsToRemove": [
+        "zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "autoScale2d", "resetScale2d"
+    ],
+    "displaylogo": False
+}
+
+# ✅ グラフ表示
+st.plotly_chart(fig, use_container_width=True, config=config)
 
 # ✅ オプション表示
 with st.expander("📅 月次データを表示"):
