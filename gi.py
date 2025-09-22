@@ -110,11 +110,11 @@ fig.update_layout(
     font=dict(size=12),
 )
 
-# モードバー構成
+# ✅ ズーム機能ON
 config = {
     "displayModeBar": True,
     "modeBarButtonsToRemove": [
-        "zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "autoScale2d", "resetScale2d"
+        "select2d", "lasso2d"  # ← ズーム関連は残す
     ],
     "displaylogo": False
 }
