@@ -5,7 +5,7 @@ from plotly.subplots import make_subplots
 
 # ページ設定
 st.set_page_config(layout="centered")
-st.title("📈 月次指標推移")
+st.title("📈 月次経済指標推移")
 
 # データ読み込み
 github_csv_url = "https://raw.githubusercontent.com/ojt8700/dash/main/getuji.csv"
